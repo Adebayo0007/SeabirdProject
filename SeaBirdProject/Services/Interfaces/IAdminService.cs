@@ -12,7 +12,7 @@ namespace SeaBirdProject.Services.Interfaces
         Task<BaseResponse<AdminDto>> GetByEmailAsync(string userEmail);
         Task<BaseResponse<IEnumerable<AdminDto>>> GetAllAsync();
         Task<BaseResponse<AdminDto>> UpdateAsync(UpdateAdminRequestModel updateAdminModel, string id);
-        Task DeleteAsync(string superAdminId);
+        Task DeleteAsync(string userId);
         Task<BaseResponse<IEnumerable<AdminDto>>> SearchAdminByEmailOrUserName(string searchInput);
     }
 }

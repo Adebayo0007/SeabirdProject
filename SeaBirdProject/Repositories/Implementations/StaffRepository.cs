@@ -1,58 +1,89 @@
-﻿using SeaBirdProject.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using SeaBirdProject.ApplicationContext;
+using SeaBirdProject.Entities;
 using SeaBirdProject.Repositories.Interfaces;
 
 namespace SeaBirdProject.Repositories.Implementations
 {
     public class StaffRepository : IStaffRepository
     {
-        public Task<Staff> CreateAsync(Staff user)
+        private readonly ApplicationDbContext _context;
+        public StaffRepository(ApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            try
+            {
+             _context = context;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The exception message says: {ex.Message}");
+            }
+        }
+        public async Task<Staff> CreateAsync(Staff user)
+        {
+            await _context.Staffs.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
 
-        public Task Delete(Staff user)
+        public async Task Delete(Staff user)
         {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Staff>> GetAllAsync()
+        public async Task<IEnumerable<Staff>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Staffs
+              .Include(s => s.User)
+              .ThenInclude(s => s.Branch)
+              .Where(s => s.User.Role.Equals("Staff") && s.User.IsActive.Equals(true) && s.User.IsRegistered.Equals(true))
+              .ToListAsync();
         }
 
-        public Task<IEnumerable<Staff>> GetAllNonActiveAsync()
+        public async Task<IEnumerable<Staff>> GetAllNonActiveAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Staffs
+               .Include(s => s.User)
+               .ThenInclude(s => s.Branch)
+               .Where(s => s.User.Role.Equals("Staff") && s.User.IsActive.Equals(false) && s.User.IsRegistered.Equals(true))
+               .ToListAsync();
         }
 
         public Staff GetByEmail(string userEmail)
         {
-            throw new NotImplementedException();
+            return _context.Staffs.Include(s => s.User).ThenInclude(s => s.Branch).
+            SingleOrDefault(s => s.User.Email.Equals(userEmail));
         }
 
         public Staff GetById(string userId)
         {
-            throw new NotImplementedException();
+            return _context.Staffs.Include(s => s.User).ThenInclude(s => s.Branch).
+           SingleOrDefault(s => s.UserId.Equals(userId));
         }
 
         public void SaveChanges()
         {
-            throw new NotImplementedException();
+            _context.SaveChanges();
         }
 
-        public Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Staff>> SearchStaffByEmailOrUsername(string searchInput)
+        public async Task<IEnumerable<Staff>> SearchStaffByEmailOrUsername(string searchInput)
         {
-            throw new NotImplementedException();
+            return await _context.Staffs.
+            Include(s => s.User).
+            ThenInclude(s => s.Branch).
+            Where(s => s.User.Email.ToLower().Equals(searchInput.ToLower()) || s.User.UserName.ToLower().Equals(searchInput.ToLower())).
+            ToListAsync();
         }
 
         public Staff Update(Staff user)
         {
-            throw new NotImplementedException();
+            _context.SaveChanges();
+            return user;
         }
     }
 }

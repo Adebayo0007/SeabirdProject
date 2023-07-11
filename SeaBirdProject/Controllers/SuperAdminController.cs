@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SeaBirdProject.Dtos.SuperAdminDto;
+using SeaBirdProject.Entities;
 using SeaBirdProject.Services.Interfaces;
 using System.Security.Claims;
 
@@ -18,7 +19,17 @@ namespace SeaBirdProject.Controllers
         [HttpGet(" GetSuperAdminById/{userId}")]
         public async Task<IActionResult> GetSuperAdminById([FromRoute] string userId)
         {
-            if (string.IsNullOrWhiteSpace(userId)) userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                try
+                {
+                    userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
             var superadminResonse = await _superAdminService.GetByIdAsync(userId);
             if (superadminResonse.IsSuccess == false)
             {
@@ -30,7 +41,17 @@ namespace SeaBirdProject.Controllers
         [HttpGet("GetSuperAdminByEmail/{superAdminEmail}")]
         public async Task<IActionResult> GetSuperAdminByEmail([FromRoute] string superAdminEmail)
         {
-            if (string.IsNullOrWhiteSpace(superAdminEmail)) superAdminEmail = User.FindFirst(ClaimTypes.Email).Value;
+            if (string.IsNullOrWhiteSpace(superAdminEmail))
+            {
+                try
+                {
+                    superAdminEmail = User.FindFirst(ClaimTypes.Email).Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
             var superAdminResponse = await _superAdminService.GetByEmailAsync(superAdminEmail);
             if (superAdminResponse.IsSuccess == false)
             {
@@ -88,7 +109,17 @@ namespace SeaBirdProject.Controllers
                 return BadRequest(new { mesage = response });
             }
 
-            if (string.IsNullOrWhiteSpace(id)) id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                try
+                {
+                    id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
             var SuperAdmin = await _superAdminService.UpdateAsync(updateRequestModel, id);
             if (SuperAdmin.IsSuccess == false)
             {

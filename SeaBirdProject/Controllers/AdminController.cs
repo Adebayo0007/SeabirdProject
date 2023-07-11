@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SeaBirdProject.Dtos.AdminDto;
+using SeaBirdProject.Services.Implementations;
 using SeaBirdProject.Services.Interfaces;
+using System.Security.Claims;
 
 namespace SeaBirdProject.Controllers
 {
@@ -73,5 +75,28 @@ namespace SeaBirdProject.Controllers
             return BadRequest(new { mesage = userExist });
 
         }
+
+        [HttpGet(" GetAdminById/{userId}")]
+        public async Task<IActionResult> GetAdminById([FromRoute] string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                try
+                {
+                   userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                }
+                catch(Exception ex) 
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
+            var superadminResonse = await _adminService.GetByIdAsync(userId);
+            if (superadminResonse.IsSuccess == false)
+            {
+                return BadRequest(superadminResonse);
+            }
+            return Ok(superadminResonse);
+        }
+
     }
 }

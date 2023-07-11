@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SeaBirdProject.ApplicationAuthenticationFolder;
 using SeaBirdProject.Dtos.UserDto;
 using SeaBirdProject.Services.Interfaces;
-using System.Data;
 using System.Security.Claims;
 
 namespace SeaBirdProject.Controllers
@@ -67,7 +64,17 @@ namespace SeaBirdProject.Controllers
         [HttpGet("GetUserById/{userId}")]
         public async Task<IActionResult> GetUserById([FromRoute] string userId)
         {
-            if (string.IsNullOrWhiteSpace(userId)) userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                try
+                {
+                    userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
             var user = await _userService.GetByIdAsync(userId);
             if (user.IsSuccess == false)
             {
@@ -79,7 +86,17 @@ namespace SeaBirdProject.Controllers
         [HttpGet("GetUserByEmail/{userEmail}")]
         public async Task<IActionResult> GetUserByEmail([FromRoute] string userEmail)
         {
-            if (string.IsNullOrWhiteSpace(userEmail)) userEmail = User.FindFirst(ClaimTypes.Email).Value;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                try
+                {
+                    userEmail = User.FindFirst(ClaimTypes.Email).Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"You need to login, the exception message says: {ex.Message}");
+                }
+            }
             var user = await _userService.GetByEmailAsync(userEmail);
             if (user.IsSuccess == false)
             {

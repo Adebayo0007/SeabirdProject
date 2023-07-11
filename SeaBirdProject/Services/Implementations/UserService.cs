@@ -10,7 +10,14 @@ namespace SeaBirdProject.Services.Implementations
         private readonly IUserRepository _userRepository;
         public UserService(IUserRepository userRepository) 
         {
-            _userRepository = userRepository;
+            try
+            { 
+               _userRepository = userRepository;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The exception message says: {ex.Message}");
+            }
         }
         public async Task DeleteAsync(string userId)
         {

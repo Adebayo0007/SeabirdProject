@@ -11,7 +11,14 @@ namespace SeaBirdProject.Repositories.Implementations
         private readonly ApplicationDbContext _context;
         public UserRepository(ApplicationDbContext context)
         {
-            _context = context;
+            try
+            {
+               _context = context;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The exception message says: {ex.Message}");
+            }
         }
 
         public async Task<User> CreateAsync(User user)

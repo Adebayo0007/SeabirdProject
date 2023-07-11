@@ -12,8 +12,15 @@ namespace SeaBirdProject.Services.Implementations
         private readonly IHttpContextAccessor _httpContextAccessor;
         public SuperAdminService(ISuperAdminRepository superAdminRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _superAdminRepository = superAdminRepository;
-            _httpContextAccessor = httpContextAccessor;
+            try
+            {
+                _superAdminRepository = superAdminRepository;
+                _httpContextAccessor = httpContextAccessor;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The exception message says: {ex.Message}");
+            }
         }
         public async Task DeleteAsync(string userId)
         {
@@ -179,6 +186,7 @@ namespace SeaBirdProject.Services.Implementations
 
         public async Task<BaseResponse<SuperAdminDto>> UpdateAsync(UpdateSuperAdminRequestModel updateSuperAdminModel, string id)
         {
+            if(id == null) id = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var superAdmin = _superAdminRepository.GetById(id);
             if (superAdmin.Equals(null))
             {
